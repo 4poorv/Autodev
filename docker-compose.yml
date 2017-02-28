@@ -1,0 +1,70 @@
+version: '2'
+services:
+  sonarqube:
+    image: sonarqube:4.5.6
+    ports:
+      - "9000:9000"
+    networks:
+      - devnetwork
+    environment:
+      - SONARQUBE_JDBC_URL=jdbc:postgresql://sonar_db:5432/sonar
+    depends_on:
+      - sonar_db
+    restart: always
+    volumes:
+      - $HOME/sonar_home/conf:/opt/sonarqube/conf
+      - $HOME/sonar_home/data:/opt/sonarqube/data
+      - $HOME/sonar_home/extensions:/opt/sonarqube/extensions
+      - $HOME/sonar_home/bundled-plugins:/opt/sonarqube/lib/bundled-plugins
+
+  sonar_db:
+    image: postgres:latest
+    networks:
+      - devnetwork
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+    restart: always
+    volumes:
+      - postgresql:/var/lib/postgresql
+      # This needs explicit mapping due to https://github.com/docker-library/postgres/blob/4e48e3228a30763913ece952c611e5e9b95c8759/Dockerfile.template#L52
+      - postgresql_data:/var/lib/postgresql/data
+
+  jenkins:
+    image: jenkins:latest
+    environment:
+      - JENKINS_HOME=/var/jenkins_home
+    ports:
+      - "50000:50000"
+      - "8080:8080"
+    networks:
+      - devnetwork
+    depends_on:
+      - artifactory
+    volumes:
+      - $HOME/jenkins_home:/var/jenkins_home #host:container
+    restart: always
+    #stdin_open: true
+    #tty: true
+    #entrypoint: /bin/sh
+
+  artifactory:
+    image: docker.bintray.io/jfrog/artifactory-oss:latest
+    ports:
+      - "8081:8081"
+    networks:
+      - devnetwork
+    restart: always
+    volumes:
+      - $HOME/artifactory_home/data:/var/opt/jfrog/artifactory/data
+      - $HOME/artifactory_home/logs:/var/opt/jfrog/artifactory/logs
+      - $HOME/artifactory_home/etc:/var/opt/jfrog/artifactory/etc
+
+
+networks:
+  devnetwork:
+    driver: bridge
+
+volumes:
+  postgresql:
+  postgresql_data:
