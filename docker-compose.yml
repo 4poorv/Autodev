@@ -1,7 +1,7 @@
 version: '2'
 services:
   sonarqube:
-    image: sonarqube:4.5.6
+    image: sonarqube
     ports:
       - "9000:9000"
     networks:
@@ -18,7 +18,7 @@ services:
       - $HOME/sonar_home/bundled-plugins:/opt/sonarqube/lib/bundled-plugins
 
   sonar_db:
-    image: postgres:latest
+    image: postgres
     networks:
       - devnetwork
     environment:
@@ -31,7 +31,7 @@ services:
       - postgresql_data:/var/lib/postgresql/data
 
   jenkins:
-    image: jenkins:latest
+    image: jenkins
     environment:
       - JENKINS_HOME=/var/jenkins_home
     ports:
