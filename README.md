@@ -1,2 +1,5 @@
 # Autodev
-Docker-based Continuous Testing Systems using docker compose
+This repository contains the docker-compose.yml file (version 2) for setting up following systems:
+  - Jenkins
+  - Artifactory
+  - Sonar
